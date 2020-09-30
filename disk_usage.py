@@ -1,4 +1,4 @@
-
+import socket
 import shutil
 import os
 import sys
@@ -26,10 +26,19 @@ def check_reboot():
     """ This returns a True if a computer is pending a reboot. """
     return os.path.exists("/run/reboot-required")
 
+def check_no_network():
+	""" Returns True if it fails to resolve Google's URL, false otherwise """
+	try:
+		socket.gethostbyname("www.google.com")
+		return False
+	except:
+		return True
+
 def main():
 	checks = [
 		(check_reboot, "Pending reboot."),
-		(check_root_full, "Root partition is full.")
+		(check_root_full, "Root partition is full."),
+		(check_no_network, "No woking network.")
 	]
 	everything_ok = True
 	for check, msg in checks:
