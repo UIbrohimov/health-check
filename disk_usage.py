@@ -27,15 +27,18 @@ def check_reboot():
     return os.path.exists("/run/reboot-required")
 
 def main():
-    if check_reboot():
-        print("Pending reboot.")
-        sys.exit(1)
-    if check_root_full():
-    	print("Root partition is full.")
-    	sys.exit(1)
+	checks = [
+		(check_reboot, "Pending reboot."),
+		(check_root_full, "Root partition is full.")
+	]
 
-    print("Everything is ok!")
-    sys.exit(0)
+	for check, msg in checks:
+		if check():
+			print(msg)
+			sys.exit(1)
+
+	print("Everything is ok!")
+	sys.exit(0)
 
 main()
 
