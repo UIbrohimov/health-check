@@ -1,6 +1,7 @@
 import socket
 import shutil
 import os
+import psutil
 import sys
 
 def check_disk_usage(disk, min_gb, min_percent):
@@ -17,6 +18,10 @@ def check_disk_usage(disk, min_gb, min_percent):
 	if percent_free < min_percent or gigabytes_free < min_gb:
 		return True
 	return False
+
+def check_cpu_constrained():
+	""" Returns True if CPU having too much usage, False otherwise"""
+	return psutil.cpu_percent(1) > 75
 
 def check_root_full():
 	""" Returns True if the root partition is full, False otherwse """
@@ -38,7 +43,8 @@ def main():
 	checks = [
 		(check_reboot, "Pending reboot."),
 		(check_root_full, "Root partition is full."),
-		(check_no_network, "No woking network.")
+		(check_no_network, "No woking network."),
+		(check_cpu_constrained, "CPU load is too high.")
 	]
 	everything_ok = True
 	for check, msg in checks:
